@@ -1,5 +1,28 @@
 const {JSDOM} = require('jsdom')
 
+async function crawlPage(currentURL) {
+    console.log(`actively crawling: ${currentURL}`)
+
+    try {
+        const resp = await fetch(currentURL)
+
+        if(resp.status > 399) {
+            console.log(`\nERR: ---error in fetch with status code: ${resp.status} on page: ${currentURL}---\n`)
+            return
+        }
+
+        const contentType = resp.headers.get("content-type")
+        if(!contentType.includes("text/html")) {
+            console.log(`\nERR: ---non html response, content type: ${contentType}, on page: ${currentURL}---\n`)
+            return
+        }
+
+        console.log(await resp.text()) // reason why we say .text() instead of .json() is because we want HTML to be returnet or to be precise text because we use HTML type text in getURLsFromHTML function
+    } catch (error) {
+        console.log(`\nERR: ---error in fetch: ${error.message} caused by bad URL at: ${currentURL}---\n`)
+    }
+}
+
 function getURLsFromHTML(htmlBody, baseURL) {
     const  urls = []
     const epmty = ""
@@ -14,7 +37,7 @@ function getURLsFromHTML(htmlBody, baseURL) {
                     const urlObj = new URL(`${baseURL}${linkElement.href}`)
                     urls.push(urlObj.href) 
                } catch (err) {
-                    console.log(`error with relative url: ${err.message}`)
+                    console.log(`\nERR: ---error with relative url: ${err.message}---\n`)
                }
             } else {
                 //absolute
@@ -22,7 +45,7 @@ function getURLsFromHTML(htmlBody, baseURL) {
                     const urlObj = new URL(linkElement.href)
                     urls.push(urlObj.href)
                 } catch (err) {
-                    console.log(`error with absolute url: ${err.message}`)
+                    console.log(`\nERR: ---error with absolute url: ${err.message}---\n`)
                 }
             }
         }
@@ -42,5 +65,6 @@ function normalizeURL(urlString) {
 
 module.exports = {
     normalizeURL,
-    getURLsFromHTML
+    getURLsFromHTML,
+    crawlPage
 }
