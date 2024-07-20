@@ -1,6 +1,6 @@
 const { crawlPage } = require('./crawl.js')
 
-function main() {
+async function main() {
     if(process.argv.length < 3) { 
         /**
          * /home/nemanja/.nvm/versions/node/v18.7.0/bin/node
@@ -19,8 +19,12 @@ function main() {
     const baseURL = process.argv[2]
 
     console.log(`starting crawl of ${baseURL}`)
-
-    crawlPage(baseURL)
+    // base url is passed twice, first time as a base url and second as a current url
+    const pages = await crawlPage(baseURL, baseURL, {}) // empty object for the pages because we havent crawled anything yet, but it will get filled up when the code runs
+    
+    for(const page of Object.entries(pages)) {
+        console.log(page)
+    }
 }
 
 main()
