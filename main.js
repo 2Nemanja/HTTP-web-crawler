@@ -1,4 +1,5 @@
 const { crawlPage } = require('./crawl.js')
+const { printReport } = require('./report.js')
 
 async function main() {
     if(process.argv.length < 3) { 
@@ -22,9 +23,8 @@ async function main() {
     // base url is passed twice, first time as a base url and second as a current url
     const pages = await crawlPage(baseURL, baseURL, {}) // empty object for the pages because we havent crawled anything yet, but it will get filled up when the code runs
     
-    for(const page of Object.entries(pages)) {
-        console.log(page)
-    }
+    printReport(pages)
+
 }
 
 main()
